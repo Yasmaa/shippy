@@ -1,0 +1,129 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOnsidXNlcm5hbWUiOiJ5YXNtYWEiLCJwYXNzd29yZCI6IjlUM0cycXRFYldLWVhVNiIsImVtYWlsIjoiZmFvdXppLmFzbWFAZ21haWwuY29tIiwiYXV0aCI6ImVXRnpiV0ZoT2psVU0wY3ljWFJGWWxkTFdWaFZOZz09In19fQ==
+  RABBIT_USERNAME: Z3Vlc3Q=
+  RABBIT_PASSWORD: Z3Vlc3Q=
+kind: Secret
+metadata:
+  name: regcred
+  # namespace: rabbits
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-deployment
+  labels:
+    app: micro
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: micro
+  template:
+    metadata:
+      labels:
+        app: micro
+    spec:
+      containers:
+      - name: micro
+        image: yasmaa/micro:latest
+        ports:
+        - containerPort: 9091
+        livenessProbe:
+          initialDelaySeconds: 100
+          periodSeconds: 5
+          httpGet:
+            path: /accounts/health
+            port: 9091
+        env:
+        - name: RABBIT_HOST 
+          value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
+        - name: RABBIT_PORT
+          value: "5672"
+        - name: RABBIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: regcred
+              key: RABBIT_USERNAME
+        - name: RABBIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: regcred
+              key: RABBIT_PASSWORD
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vip-deployment
+  labels:
+    app: vip
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vip
+  template:
+    metadata:
+      labels:
+        app: vip
+    spec:
+      containers:
+      - name: vip
+        image: yasmaa/vip:latest
+        ports:
+        - containerPort: 9092
+        livenessProbe:
+          initialDelaySeconds: 100
+          periodSeconds: 5
+          httpGet:
+            path: /vip/health
+            port: 9092
+        env:
+        - name: RABBIT_HOST 
+          value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
+        - name: RABBIT_PORT
+          value: "5672"
+        - name: RABBIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: regcred
+              key: RABBIT_USERNAME
+        - name: RABBIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: regcred
+              key: RABBIT_PASSWORD
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: micro
+  name: micro-service
+spec:
+  ports:
+  - port: 9091
+    targetPort: 9091
+  selector:
+    app: micro
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: vip
+  name: vip-service
+spec:
+  ports:
+  - port: 9092
+    targetPort: 9092
+  selector:
+    app: vip
+  type: ClusterIP
