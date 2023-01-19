@@ -20,7 +20,7 @@ var rabbit_user = os.Getenv("RABBIT_USERNAME")
 var rabbit_password = os.Getenv("RABBIT_PASSWORD")
 
 func main() {
-	fmt.Printf("Starting the service %v\n", appName)
+	fmt.Printf("Starting the service  %v\n", appName)
 
 	initializeBoltClient()
 	initializeMessaging()
