@@ -35,7 +35,7 @@ jobs:
     - name: Build with Native Image and Dockerizing it
       run: |
         cd accountservice
-        docker build -f Dockerfile -t $IMAGE_NAME:latest .
+        docker build -f Dockerfile -t $IMAGE_NAME:${{github.run_number}} .
         docker images
 
 
@@ -47,7 +47,7 @@ jobs:
 
     - name: Push the image to Dockerhub
       run: |
-        docker image tag $IMAGE_NAME:$BUILD_NUMBER docker.io/$DOCKER_USERNAME/$IMAGE_NAME:$BUILD_NUMBER
-        docker image push docker.io/$DOCKER_USERNAME/$IMAGE_NAME:$BUILD_NUMBER
+        docker image tag $IMAGE_NAME:$BUILD_NUMBER docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
+        docker image push docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
 
    
