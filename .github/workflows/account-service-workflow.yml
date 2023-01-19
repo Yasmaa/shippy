@@ -30,12 +30,12 @@ jobs:
         token: ${{secrets.github_token}}        
 
     - name: Print new build number
-      run: echo "Build number is $BUILD_NUMBER"
+      run: echo ${{github.run_number}}
 
     - name: Build with Native Image and Dockerizing it
       run: |
         cd accountservice
-        docker build -f Dockerfile -t $IMAGE_NAME:$BUILD_NUMBER .
+        docker build -f Dockerfile -t $IMAGE_NAME:latest .
         docker images
 
 
