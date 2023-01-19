@@ -46,8 +46,12 @@ jobs:
         password: ${{secrets.DOCKERHUB_PASSWORD}}
 
     - name: Push the image to Dockerhub
-      run: |
-        docker image tag $IMAGE_NAME:$BUILD_NUMBER docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
-        docker image push docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: $DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
+      # run: |
+      #   docker image tag $IMAGE_NAME:$BUILD_NUMBER docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
+      #   docker image push docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
 
    
