@@ -37,6 +37,8 @@ jobs:
     - name: Push the image to Dockerhub
       uses: docker/build-push-action@v3
       with:
+        context: ./accountservice
+        file: ./accountservice/Dockerfile
         push: true
         tags: ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{github.run_number}}
       # run: |
