@@ -43,9 +43,25 @@ jobs:
         context: accountservice
         file: accountservice/Dockerfile
         push: true
-        tags: ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{github.run_number}}
-      # run: |
-      #   docker image tag $IMAGE_NAME:$BUILD_NUMBER docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
-      #   docker image push docker.io/$DOCKER_USERNAME/$IMAGE_NAME:${{github.run_number}}
-
+        tags: ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{ github.sha }}
    
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
+      with:
+        kustomize-version: "3.8.7"
+
+    - name: Update Kubernetes manifests
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      run: |
+       cd kube/services
+       kustomize edit set image ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{ github.sha }}
+    - name: Commit files
+      run: |
+        git config --local user.email "github-actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git commit -am "bump dev env image"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.API_TOKEN_GITHUB }}
