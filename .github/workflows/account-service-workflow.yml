@@ -56,7 +56,12 @@ jobs:
       run: |
        cd kube/services
        kustomize edit set image ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{ github.sha }}
-    - name: Commit & Push changes
-      uses: actions-js/push@master
+    - name: Commit files
+      run: |
+        git config --local user.email "github-actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git commit -am "bump dev env image"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.API_TOKEN_GITHUB }}
