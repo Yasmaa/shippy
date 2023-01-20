@@ -56,7 +56,7 @@ jobs:
       run: |
        cd kube/services
        kustomize edit set image ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{ github.sha }}
-     - name: Commit & Push changes
+    - name: Commit & Push changes
       uses: actions-js/push@master
       with:
         github_token: ${{ secrets.API_TOKEN_GITHUB }}
