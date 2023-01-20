@@ -1,18 +1,18 @@
-name: Account Service
+name: Vip Service
 on: 
   push:
     branches:
       - main
     paths:
-      - 'accountservice/**'
+      - 'vipservice/**'
 
 # Environment variables available to all jobs and steps in this workflow
 env:
   GITHUB_SHA: ${{ github.sha }}
   REGISTRY_HOSTNAME: docker.io
   DOCKER_USERNAME: yasmaa
-  IMAGE_NAME: micro
-  PORT: 9091
+  IMAGE_NAME: vip
+  PORT: 9092
 
 jobs:
   setup-build-publish-deploy:
@@ -40,8 +40,8 @@ jobs:
     - name: Push the image to Dockerhub
       uses: docker/build-push-action@v3
       with:
-        context: accountservice
-        file: accountservice/Dockerfile
+        context: vipservice
+        file: vipservice/Dockerfile
         push: true
         tags: ${{env.DOCKER_USERNAME}}/${{env.IMAGE_NAME}}:${{ github.sha }}
    
